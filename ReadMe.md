@@ -1,4 +1,4 @@
-# SportsBet - Application for sports betting
+# EduConnect - Application for sharing knowledge
 
 ![NestJS](https://img.shields.io/badge/NestJS-v9.0-orange)
 ![Angular](https://img.shields.io/badge/Angular-v16.0-red)
@@ -18,7 +18,7 @@
 
 ## Project descriptiom
 
-SportsBet is a modern web application for sports betting which allows users to watch games, place bets and track scores in real time. Backend is developed in NestJS, frontend in Angular, and database runs in Docker container for easier maintenance and deployment.
+EduConnect is a moder web application where users are allowed to register, login and add posts. Main purpose of application is to share knowledge through posts that contains images, videos and/or text. Users can comment, like/dislike posts, but also give a reviews about other users.
 
 ---
 

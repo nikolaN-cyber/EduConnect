@@ -38,9 +38,6 @@ export class User {
 
   @Column({type: 'enum', enum: UserRole, default: UserRole.USER,})
   role: UserRole;
-  
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-  balance: number;
 
   @CreateDateColumn()
   createdAt: Date;
