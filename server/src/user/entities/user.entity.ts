@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
 import { UserRole } from 'src/types/enums';
+import { Post } from 'src/post/entities/post.entity';
 
 @Entity()
 export class User {
@@ -41,4 +42,7 @@ export class User {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(() => Post, post => post.user, {cascade: true})
+  posts: Post[];
 }

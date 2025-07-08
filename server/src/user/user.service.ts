@@ -4,20 +4,21 @@ import { CreateUserDTO, UpdateUserDTO } from "./dto/user.dto";
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { UserRole } from "src/types/enums";
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>
-    ){}
+    ) { }
 
-    async createUser(user: CreateUserDTO) : Promise<User> {
+    async createUser(user: CreateUserDTO): Promise<User> {
         if (user.password !== user.repeatPassword) {
             throw new BadRequestException('Passwords do not match');
         }
 
-        const existingUser = await this.userRepository.findOne({where: {email: user.email}})
+        const existingUser = await this.userRepository.findOne({ where: { email: user.email } })
         if (existingUser) {
             throw new ConflictException('Email already exists');
         }
@@ -40,28 +41,50 @@ export class UserService {
         return await this.userRepository.save(newUser);
     }
 
-    async deleteUser(id: string) : Promise<void> {
-        const user = await this.userRepository.findOneBy({id});
-        if (!user){
+    async deleteUser(id: string): Promise<void> {
+        const user = await this.userRepository.findOneBy({ id });
+        if (!user) {
             throw new NotFoundException('User not found');
         }
         await this.userRepository.remove(user);
     }
 
-    async updateUser(id: string, updateUserDto: UpdateUserDTO) : Promise<User> {
-        const user = await this.userRepository.findOneBy({id});
-        if (!user){
+    async updateUser(id: string, updateUserDto: UpdateUserDTO): Promise<User> {
+        const user = await this.userRepository.findOneBy({ id });
+        if (!user) {
             throw new NotFoundException('User not found');
         }
         Object.assign(user, updateUserDto);
         return await this.userRepository.save(user);
     }
 
-    async findByEmail(email: string) : Promise<User|null>{
-        return await this.userRepository.findOne({where: {email}});
+    async findByEmail(email: string): Promise<User | null> {
+        return await this.userRepository.findOne({ where: { email } });
     }
 
-    async comparePasswords(password: string, hashedPassword: string) : Promise<boolean> {
+    async comparePasswords(password: string, hashedPassword: string): Promise<boolean> {
         return bcrypt.compare(password, hashedPassword);
+    }
+
+    async createAdminIfNotExists(): Promise<void> {
+        const admin = await this.userRepository.findOne({ where: { role: UserRole.ADMIN } });
+
+        if (!admin) {
+            const hashedPassword = await bcrypt.hash('admin', 10);
+            const newAdmin = this.userRepository.create({
+                username: 'admin',
+                email: 'admin@example.com',
+                password: hashedPassword,
+                firstName: 'Admin',
+                lastName: 'User',
+                dateOfBirth: new Date('1990-01-01'),
+                country: 'Srbija',
+                city: 'Beograd',
+                address: 'Adresa Admina 1',
+                phoneNumber: '+381600000000',
+                role: UserRole.ADMIN,
+            });
+            await this.userRepository.save(newAdmin);
+        }
     }
 }
