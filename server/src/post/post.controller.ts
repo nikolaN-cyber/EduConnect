@@ -3,7 +3,9 @@ import { PostService } from "./post.service";
 import { CreatePostDto, UpdatePostDto } from "./dto/post.dto";
 import { UserPayload } from "src/types/user-payload.interface";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { ApiBearerAuth } from "@nestjs/swagger";
 
+@ApiBearerAuth()
 @Controller('api/posts')
 export class PostController {
     constructor( private readonly postService: PostService ) {}

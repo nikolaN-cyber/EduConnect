@@ -3,7 +3,9 @@ import { CommentService } from "./comment.service";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { CreateCommentDto, GetCommentsDto } from "./dto/coment.dto";
 import { UserPayload } from "src/types/user-payload.interface";
+import { ApiBearerAuth } from "@nestjs/swagger";
 
+@ApiBearerAuth()
 @Controller('api/comments')
 export class CommentController {
     constructor(

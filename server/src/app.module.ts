@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
+import { Comment } from './comment/entities/comment.entity';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { CommentModule } from './comment/comment.module';
       password: 'Nikola24@',
       database: 'EduConnect',
       synchronize: true,
-      entities: [User, Post]
+      entities: [User, Post, Comment]
     }),
     UserModule,
     AuthModule,
