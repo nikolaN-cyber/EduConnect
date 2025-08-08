@@ -4,10 +4,10 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { Post } from './post/entities/post.entity';
-import { PostContent } from './post-content/entities/post-content.entity';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -22,10 +22,11 @@ import { AuthModule } from './auth/auth.module';
       password: 'Nikola24@',
       database: 'EduConnect',
       synchronize: true,
-      entities: [User, Post, PostContent]
+      entities: [User, Post]
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    PostModule
   ],
   controllers: [AppController],
   providers: [AppService],

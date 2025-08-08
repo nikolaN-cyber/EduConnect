@@ -11,6 +11,6 @@ import { SeedService } from "./seed.service";
     ],
     providers: [UserService, SeedService],
     controllers: [UserController],
-    exports: [UserService, SeedService]
+    exports: [UserService, SeedService, TypeOrmModule]
 })
 export class UserModule {}

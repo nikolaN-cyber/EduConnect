@@ -35,7 +35,8 @@ export class UserService {
             country: user.country,
             city: user.city,
             address: user.address,
-            phoneNumber: user.phoneNumber
+            phoneNumber: user.phoneNumber,
+            likedPosts: []
         });
 
         return await this.userRepository.save(newUser);
@@ -56,6 +57,10 @@ export class UserService {
         }
         Object.assign(user, updateUserDto);
         return await this.userRepository.save(user);
+    }
+
+    async findById(id: string): Promise<User|null> {
+        return await this.userRepository.findOne({where: {id}});
     }
 
     async findByEmail(email: string): Promise<User | null> {
