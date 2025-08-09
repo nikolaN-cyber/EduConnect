@@ -43,7 +43,7 @@ export class UserService {
         return await this.userRepository.save(newUser);
     }
 
-    async deleteUser(userPayload: UserPayload): Promise<void> {
+    async deleteAccount(userPayload: UserPayload): Promise<void> {
         const user = await this.userRepository.findOne({ where: { id: userPayload.sub }});
         if (!user) {
             throw new NotFoundException('User not found');
@@ -51,7 +51,7 @@ export class UserService {
         await this.userRepository.remove(user);
     }
 
-    async updateUser(updateUserDto: UpdateUserDTO, userPayload: UserPayload): Promise<User> {
+    async updateProfile(updateUserDto: UpdateUserDTO, userPayload: UserPayload): Promise<User> {
         const user = await this.userRepository.findOne({ where: { id: userPayload.sub }});
         if (!user) {
             throw new NotFoundException('User not found');
@@ -92,5 +92,13 @@ export class UserService {
             });
             await this.userRepository.save(newAdmin);
         }
+    }
+
+    async deleteUserByAdmin(userId: string): Promise<void> {
+        const user = await this.userRepository.findOne({where: {id: userId}});
+        if (!user){
+            throw new NotFoundException("User not found!");
+        }
+        await this.userRepository.remove(user);
     }
 }
