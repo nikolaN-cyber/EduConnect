@@ -1,7 +1,7 @@
-import { Controller, Body, Request, Param, Post, UseGuards, Query, Get } from "@nestjs/common";
+import { Controller, Body, Request, Param, Post, UseGuards, Query, Get, Patch, Delete } from "@nestjs/common";
 import { CommentService } from "./comment.service";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { CreateCommentDto, GetCommentsDto } from "./dto/coment.dto";
+import { CreateCommentDto, GetCommentsDto, UpdateCommentDto } from "./dto/coment.dto";
 import { UserPayload } from "src/types/user-payload.interface";
 import { ApiBearerAuth } from "@nestjs/swagger";
 
@@ -15,8 +15,19 @@ export class CommentController {
     @UseGuards(JwtAuthGuard)
     @Post('create')
     async createComment(@Body() comment: CreateCommentDto, @Request() req){
-        const userPayload: UserPayload = req.user;
-        return this.commentService.createComment(comment, userPayload);
+        return this.commentService.createComment(comment, req.user);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('edit/:id')
+    async editComment(@Param('id') id:string, @Body() editComment: UpdateCommentDto, @Request() req) {
+        return this.commentService.editComment(id, editComment, req.user);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('delete/:id')
+    async deleteComment(@Param('id') id:string, @Request() req) {
+        return this.commentService.deleteComment(id, req.user);
     }
 
     @UseGuards(JwtAuthGuard)

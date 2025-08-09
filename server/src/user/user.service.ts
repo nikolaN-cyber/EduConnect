@@ -1,10 +1,11 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { User } from "./entities/user.entity";
 import { CreateUserDTO, UpdateUserDTO } from "./dto/user.dto";
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserRole } from "src/types/enums";
+import { UserPayload } from "src/types/user-payload.interface";
 
 @Injectable()
 export class UserService {
@@ -42,16 +43,16 @@ export class UserService {
         return await this.userRepository.save(newUser);
     }
 
-    async deleteUser(id: string): Promise<void> {
-        const user = await this.userRepository.findOneBy({ id });
+    async deleteUser(userPayload: UserPayload): Promise<void> {
+        const user = await this.userRepository.findOne({ where: { id: userPayload.sub }});
         if (!user) {
             throw new NotFoundException('User not found');
         }
         await this.userRepository.remove(user);
     }
 
-    async updateUser(id: string, updateUserDto: UpdateUserDTO): Promise<User> {
-        const user = await this.userRepository.findOneBy({ id });
+    async updateUser(updateUserDto: UpdateUserDTO, userPayload: UserPayload): Promise<User> {
+        const user = await this.userRepository.findOne({ where: { id: userPayload.sub }});
         if (!user) {
             throw new NotFoundException('User not found');
         }

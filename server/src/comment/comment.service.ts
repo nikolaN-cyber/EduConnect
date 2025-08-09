@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Comment } from "./entities/comment.entity";
@@ -6,6 +6,7 @@ import { User } from "src/user/entities/user.entity";
 import { Post } from "src/post/entities/post.entity";
 import { CreateCommentDto, GetCommentsDto, UpdateCommentDto } from "./dto/coment.dto";
 import { UserPayload } from "src/types/user-payload.interface";
+import { UserRole } from "src/types/enums";
 
 @Injectable()
 export class CommentService {
@@ -38,18 +39,30 @@ export class CommentService {
         return await this.commentRepository.save(newComment);
     }
 
-    async deleteComment(id: string): Promise<void> {
-        const comment = await this.commentRepository.findOne({ where: { id } });
+    async deleteComment(id: string, userPayload: UserPayload): Promise<void> {
+        const comment = await this.commentRepository.findOne({ 
+            where: { id },
+            relations: ['author']
+        });
         if (!comment) {
             throw new NotFoundException('Comment not found!');
+        }
+        if (comment.author.id !== userPayload.sub && userPayload.role !== UserRole.ADMIN){
+            throw new ForbiddenException("You are not allowed to delete this comment!");
         }
         await this.commentRepository.remove(comment);
     }
 
-    async editComment(commentId: string, editComment: UpdateCommentDto): Promise<Comment> {
-        const comment = await this.commentRepository.findOne({ where: { id: commentId } });
+    async editComment(commentId: string, editComment: UpdateCommentDto, userPayload: UserPayload): Promise<Comment> {
+        const comment = await this.commentRepository.findOne({ 
+            where: { id: commentId },
+            relations: ['author'] 
+        });
         if (!comment) {
             throw new NotFoundException('Comment not found!');
+        }
+        if (comment.author.id !== userPayload.sub && userPayload.role !== UserRole.ADMIN){
+            throw new ForbiddenException('You are not allowed to edit this comment!');
         }
         Object.assign(comment, editComment);
         return this.commentRepository.save(comment);

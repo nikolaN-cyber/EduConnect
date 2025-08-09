@@ -13,28 +13,24 @@ export class PostController {
     @UseGuards(JwtAuthGuard)
     @Post('add')
     async createPost(@Body() createPostDto: CreatePostDto, @Request() req) {
-        const userPayload: UserPayload = req.user;
-        return this.postService.createPost(createPostDto, userPayload);
+        return this.postService.createPost(createPostDto, req.user);
     }
 
     @UseGuards(JwtAuthGuard)
     @Delete('delete/:id')
     async deletePost(@Param('id') id: string, @Request() req){
-        const userPayload: UserPayload = req.user;
-        return this.postService.deletePost(id, userPayload);
+        return this.postService.deletePost(id, req.user);
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch('edit/:id')
     async editPost(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto, @Request() req){
-        const userPayload: UserPayload = req.user;
-        return this.postService.updatePost(id, updatePostDto, userPayload);
+        return this.postService.updatePost(id, updatePostDto, req.user);
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch('like/:id')
     async likePost(@Param('id') id: string, @Request() req){
-        const userPayload: UserPayload = req.user;
-        return this.postService.likePost(id, userPayload);
+        return this.postService.likePost(id, req.user);
     }
 }
