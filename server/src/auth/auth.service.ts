@@ -10,10 +10,12 @@ export class AuthService {
         private configService: ConfigService
     ) { }
 
-    async login(user: User): Promise<{ access_token: string }> {
+    async login(user: User): Promise<{ access_token: string, user: Partial<User> }> {
+        const {password, ...safeUser} = user;
         const payload = { email: user.email, sub: user.id, role: user.role }
         return {
-            access_token: this.jwtService.sign(payload)
+            access_token: this.jwtService.sign(payload),
+            user: safeUser
         }
     }
 }

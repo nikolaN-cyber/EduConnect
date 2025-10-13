@@ -31,28 +31,28 @@ export class PostService {
     }
 
     async deletePost(id: string, userPayload: UserPayload): Promise<void> {
-        const post = await this.postRepository.findOne({ 
+        const post = await this.postRepository.findOne({
             where: { id },
             relations: ['user'],
-         })
+        })
         if (!post) {
             throw new NotFoundException("Post not found!");
         }
-        if (post.user.id !== userPayload.sub){
+        if (post.user.id !== userPayload.sub) {
             throw new ForbiddenException('You are not allowed to delete this post!')
         }
         await this.postRepository.remove(post);
     }
 
     async updatePost(id: string, updatePostDto: UpdatePostDto, userPayload: UserPayload): Promise<Post> {
-        const post = await this.postRepository.findOne({ 
+        const post = await this.postRepository.findOne({
             where: { id },
-            relations: ['user'] 
+            relations: ['user']
         });
         if (!post) {
             throw new NotFoundException("Post not found!");
         }
-        if (post.user.id !== userPayload.sub){
+        if (post.user.id !== userPayload.sub) {
             throw new ForbiddenException('You are not allowed to update this post!')
         }
         post.title = updatePostDto.title;
@@ -64,13 +64,13 @@ export class PostService {
     }
 
     async findAll(): Promise<Post[]> {
-        return await this.postRepository.find({relations: ['comments']});
+        return await this.postRepository.find({ relations: ['comments', 'user'] });
     }
 
     async likePost(postId: string, userPayload: UserPayload): Promise<Post> {
-        const user = await this.userRepository.findOne({ 
+        const user = await this.userRepository.findOne({
             where: { id: userPayload.sub },
-            relations: ['likedPosts'] 
+            relations: ['likedPosts']
         });
 
         if (!user) {
@@ -92,7 +92,11 @@ export class PostService {
             user.likedPosts = user.likedPosts.filter(p => p.id !== postId);
         }
         await this.userRepository.save(user);
-        return await this.postRepository.save(post);
+        await this.postRepository.save(post);
+        return this.postRepository.findOne({
+            where: { id: postId },
+            relations: ['user', 'comments', 'usersLiked'], 
+        });
     }
 
 }

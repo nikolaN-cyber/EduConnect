@@ -1,0 +1,28 @@
+<div class="profile-wrapper" *ngIf="user$ | async as user; else notLoggedIn">
+    <div class="profile-card">
+        <div class="profile-header">
+            <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+            <p class="username">{{ '@' + user.username }}</p>
+        </div>
+
+        <div class="profile-details">
+            <div class="detail"><span>Email:</span> {{ user.email }}</div>
+            <div class="detail"><span>Country:</span> {{ user.country }}</div>
+            <div class="detail"><span>City:</span> {{ user.city }}</div>
+            <div class="detail"><span>Phone:</span> {{ user.phoneNumber }}</div>
+            <div class="detail"><span>Address:</span> {{ user.address }}</div>
+            <div class="detail"><span>Date of Birth:</span> {{ user.dateOfBirth | date }}</div>
+            <div class="detail"><span>Role:</span> {{ user.role }}</div>
+        </div>
+
+        <button mat-raised-button color="primary" (click)="openEditModal(user)">
+            Edit Profile
+        </button>
+    </div>
+</div>
+
+<ng-template #notLoggedIn>
+    <div class="not-logged">
+        <p>Please login to view your profile.</p>
+    </div>
+</ng-template>

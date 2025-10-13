@@ -1,13 +1,22 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { SHARED_IMPORTS } from './shared/shared-imports';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { selectIsLoggedIn } from './store/user/user.selectors';
+import { UserState } from './store/user/user.reducer';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
+  imports: [SHARED_IMPORTS, NavbarComponent],
+  templateUrl: `./app.component.html`,
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'client';
+  isLoggedIn$: Observable<boolean>;
+
+  constructor(private store: Store<UserState>) {
+    this.isLoggedIn$ = this.store.select(selectIsLoggedIn);
+  }
 }

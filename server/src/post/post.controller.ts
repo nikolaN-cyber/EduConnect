@@ -1,4 +1,4 @@
-import { Controller, Request, Body, Param, UseGuards, Post, Delete, Patch } from "@nestjs/common";
+import { Controller, Request, Body, Param, UseGuards, Post, Delete, Patch, Get } from "@nestjs/common";
 import { PostService } from "./post.service";
 import { CreatePostDto, UpdatePostDto } from "./dto/post.dto";
 import { UserPayload } from "src/types/user-payload.interface";
@@ -32,5 +32,11 @@ export class PostController {
     @Patch('like/:id')
     async likePost(@Param('id') id: string, @Request() req){
         return this.postService.likePost(id, req.user);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('get-all')
+    async getPosts(){
+        return this.postService.findAll();
     }
 }

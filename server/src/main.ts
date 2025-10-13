@@ -14,6 +14,12 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: 'http://localhost:4200',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+  });
+
   const config = new DocumentBuilder()
     .setTitle('EduConnect API')
     .setDescription('API dokumentacija za EduConnect projekat')
