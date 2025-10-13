@@ -1,4 +1,4 @@
-<nav class="navbar">
+<nav *ngIf="isLoggedIn$ | async" class="navbar">
     <div class="logo">
         <a routerLink="/">EduConnect</a>
     </div>
@@ -10,7 +10,7 @@
         <li><a routerLink="/home">Home</a></li>
         <li><a routerLink="/posts">Posts</a></li>
         <li><a routerLink="/profile">My Profile</a></li>
-        <li><a routerLink="/my-posts">My posts</a></li>
+        <li><a routerLink="/my-engagement">My engagement</a></li>
         <li><a (click)="logout()">Logout</a></li>
     </ul>
 </nav>

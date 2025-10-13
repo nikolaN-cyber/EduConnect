@@ -3,6 +3,8 @@ import { Store } from '@ngrx/store';
 import { logoutUser } from '../../store/user/user.actions';
 import { SHARED_IMPORTS } from '../../shared/shared-imports';
 import { UserState } from '../../store/user/user.reducer';
+import { selectIsLoggedIn } from '../../store/user/user.selectors';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -13,7 +15,10 @@ import { UserState } from '../../store/user/user.reducer';
 })
 export class NavbarComponent {
 
+  isLoggedIn$: Observable<boolean>;
+
   constructor(private store: Store<UserState>) {
+    this.isLoggedIn$ = this.store.select(selectIsLoggedIn)
   }
 
   logout() {

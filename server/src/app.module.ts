@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { Comment } from './comment/entities/comment.entity';
+import { MulterModule } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 
 @Module({
   imports: [
@@ -29,9 +31,10 @@ import { Comment } from './comment/entities/comment.entity';
     UserModule,
     AuthModule,
     PostModule,
-    CommentModule
+    CommentModule,
+    MulterModule.register({ storage: memoryStorage })
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -9,6 +9,10 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { UserEffects } from './store/user/user.effects';
 import { postsReducer } from './store/post/post.reducer';
 import { PostEffects } from './store/post/post.effects';
+import { commentReducer } from './store/comments/comment.reducer';
+import { CommentEffects } from './store/comments/comment.effects';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { AuthInterceptor } from './auth/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,11 +21,12 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
 
     provideStore({
-        user: userReducer,
-        posts:  postsReducer
-      }),
+      user: userReducer,
+      posts: postsReducer,
+      comments: commentReducer
+    }),
 
-    provideEffects([UserEffects, PostEffects]),
+    provideEffects([UserEffects, PostEffects, CommentEffects]),
 
     importProvidersFrom(
       StoreDevtoolsModule.instrument({
@@ -29,5 +34,7 @@ export const appConfig: ApplicationConfig = {
         logOnly: false,
       })
     ), provideAnimationsAsync(),
+    provideHttpClient(withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
 };

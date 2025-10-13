@@ -27,27 +27,42 @@ export const commentReducer = createReducer(
         loading: true,
         error: null,
     })),
-    on(CommentActions.loadCommentsSuccess, (state, { comments }) =>
-        commentAdapter.setAll(comments, { ...state, loading: false })
-    ),
+    on(CommentActions.loadCommentsSuccess, (state, { comments }) => {
+        const normalizedComments = comments.map(c => ({
+            ...c,
+            createdAt: new Date(c.createdAt),
+            updatedAt: new Date(c.updatedAt)
+        }));
+        return commentAdapter.setAll(normalizedComments, { ...state, loading: false });
+    }),
     on(CommentActions.loadCommentsFailure, (state, { error }) => ({
         ...state,
         loading: false,
         error,
     })),
-    on(CommentActions.addCommentSuccess, (state, { comment }) =>
-        commentAdapter.addOne(comment, state)
-    ),
+    on(CommentActions.addCommentSuccess, (state, { comment }) => {
+        const normalizedComment = {
+            ...comment,
+            createdAt: new Date(comment.createdAt),
+            updatedAt: new Date(comment.updatedAt)
+        };
+        return commentAdapter.addOne(normalizedComment, state);
+    }),
     on(CommentActions.addCommentFailure, (state, { error }) => ({
         ...state,
         error,
     })),
-    on(CommentActions.editCommentSuccess, (state, { comment }) =>
-        commentAdapter.updateOne(
-            { id: comment.id, changes: comment },
+    on(CommentActions.editCommentSuccess, (state, { comment }) => {
+        const normalizedComment = {
+            ...comment,
+            createdAt: new Date(comment.createdAt),
+            updatedAt: new Date(comment.updatedAt)
+        };
+        return commentAdapter.updateOne(
+            { id: normalizedComment.id, changes: normalizedComment },
             state
-        )
-    ),
+        );
+    }),
     on(CommentActions.editCommentFailure, (state, { error }) => ({
         ...state,
         error,

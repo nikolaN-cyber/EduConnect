@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Post } from '../../models/post';
 import { selectAllPosts, selectPostsLoading } from '../../store/post/post.selectors';
 import { PostsState } from '../../store/post/post.reducer';
@@ -18,11 +18,14 @@ import { PostService } from '../../services/post.service';
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.css']
 })
-export class PostsComponent implements OnInit {
+export class PostsComponent implements OnInit, OnDestroy {
   posts$: Observable<Post[]>;
   loading$: Observable<boolean>;
   selectedPost: Post | null = null;
   currentUserId: string | null;
+  searchTerm: string = '';
+  filteredPosts: Post[] = [];
+  private subscription = new Subscription();
 
   constructor(
     private store: Store<PostsState>,
@@ -31,25 +34,51 @@ export class PostsComponent implements OnInit {
   ) {
     this.posts$ = this.store.select(selectAllPosts);
     this.loading$ = this.store.select(selectPostsLoading);
-    const currentUser = localStorage.getItem('user')
-    if (currentUser) {
-      const user = JSON.parse(currentUser);
-      this.currentUserId = user.id;
-    } else {
-      this.currentUserId = null;
-    }
+
+    const currentUser = localStorage.getItem('user');
+    this.currentUserId = currentUser ? JSON.parse(currentUser).id : null;
   }
 
   ngOnInit() {
     this.store.dispatch(loadPosts());
+
+    // Kad se postovi učitaju, postavi ih odmah kao filteredPosts
+    const sub = this.posts$.subscribe(posts => {
+      if (posts) {
+        this.filteredPosts = posts;
+      }
+    });
+    this.subscription.add(sub);
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   selectPost(post: Post) {
     this.selectedPost = post;
   }
 
+  applyFilter() {
+    this.posts$.subscribe(posts => {
+      if (!this.searchTerm.trim()) {
+        this.filteredPosts = posts;
+      } else {
+        this.filteredPosts = posts.filter(post =>
+          post.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+        );
+      }
+
+      // Primeri funkcionalnog programiranja:
+      const totalLikes = this.filteredPosts.reduce((acc, post) => acc + (post.likes || 0), 0);
+      console.log('Total likes of filtered posts:', totalLikes);
+
+      this.filteredPosts.forEach(post => console.log('Filtered post ID:', post.id));
+    });
+  }
+
   openCreatePostModal() {
-    const dialogRef = this.dialog.open(CreatePostModalComponent, {
+    this.dialog.open(CreatePostModalComponent, {
       width: '450px'
     });
   }

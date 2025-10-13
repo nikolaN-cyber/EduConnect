@@ -14,7 +14,7 @@
 
         <div class="form-group">
             <label>Image URL</label>
-            <input type="text" formControlName="imageUrl" />
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" />
         </div>
 
         <div class="modal-buttons">

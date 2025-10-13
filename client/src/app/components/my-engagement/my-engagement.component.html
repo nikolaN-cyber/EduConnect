@@ -1,0 +1,30 @@
+<div class="engagement-wrapper">
+    <h2>My Engagement</h2>
+
+    <div class="section">
+        <h3>Liked Posts</h3>
+        <div *ngIf="likedPosts.length; else noLikedPosts" class="posts-list">
+            <div class="post-card" *ngFor="let post of likedPosts">
+                <h4>{{ post.title }}</h4>
+                <p>Author: {{ post.user.username }}</p>
+                <p *ngIf="post.content?.text">{{ post.content?.text }}</p>
+            </div>
+        </div>
+        <ng-template #noLikedPosts>
+            <p>You haven't liked any posts yet.</p>
+        </ng-template>
+    </div>
+
+    <div class="section">
+        <h3>My Comments</h3>
+        <div *ngIf="myComments.length; else noComments" class="comments-list">
+            <div class="comment-card" *ngFor="let comment of myComments">
+                <p>{{ comment.text }}</p>
+                <small>On post: {{ comment.post.title }}</small>
+            </div>
+        </div>
+        <ng-template #noComments>
+            <p>You haven't made any comments yet.</p>
+        </ng-template>
+    </div>
+</div>

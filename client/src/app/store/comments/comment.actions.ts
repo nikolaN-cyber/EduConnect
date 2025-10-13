@@ -8,12 +8,12 @@ export const loadComments = createAction(
 
 export const loadCommentsSuccess = createAction(
     'loadCommentsSuccess',
-    props<{ comments: Comment[] }>()
+    props<{ comments: Comment[]; offset?: number }>()
 );
 
 export const loadCommentsFailure = createAction(
     'loadCommentsFailure',
-    props<{ error: string }>()
+    props<{ error: string; offset?: number }>()
 );
 
 export const addComment = createAction(

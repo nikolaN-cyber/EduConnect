@@ -1,69 +1,35 @@
 import { Injectable } from "@angular/core";
-import { CreateUserDTO, LoginUser, UpdateUserDTO, User } from "../models/user";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
 import { environment } from "../../environments/environment";
-import { getToken } from "../auth/user-context";
+import { CreateUserDTO, LoginUser, UpdateUserDTO, User } from "../models/user";
+import { Post } from "../models/post";
+import { Comment } from "../models/comment";
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserService {
 
-    constructor() {
-     }
+    constructor(private http: HttpClient) { }
 
-    async login(email: string, password: string): Promise<LoginUser> {
-        const response = await fetch(`${environment.api}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw { status: response.status, message: data?.message || 'Login failed' };
-        }
-
-        return data;
+    login(email: string, password: string): Observable<LoginUser> {
+        return this.http.post<LoginUser>(`${environment.api}/auth/login`, { email, password });
     }
 
-    async register(userDTO: CreateUserDTO): Promise<User> {
-        const response = await fetch(`${environment.api}/users/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userDTO),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw { status: response.status, message: data?.message || 'Register failed' };
-        }
-
-        return data;
+    register(userDTO: CreateUserDTO): Observable<User> {
+        return this.http.post<User>(`${environment.api}/users/register`, userDTO);
     }
 
-    async editUserProfile(editDto: UpdateUserDTO, id: string): Promise<User> {
-        const token = getToken()
-        const response = await fetch(`${environment.api}/users/edit/${id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(editDto),
-        });
+    editUserProfile(editDto: UpdateUserDTO, id: string): Observable<User> {
+        return this.http.patch<User>(`${environment.api}/users/edit/${id}`, editDto);
+    }
 
-        const data = await response.json();
+    getLikedPosts(): Observable<Post[]> {
+        return this.http.get<Post[]>(`${environment.api}/users/my-liked-posts`);
+    }
 
-        if (!response.ok) {
-            throw { status: response.status, message: data?.message || 'Update failed' };
-        }
-
-        return data;
+    getMyComments(): Observable<Comment[]> {
+        return this.http.get<Comment[]>(`${environment.api}/users/my-comments`);
     }
 }

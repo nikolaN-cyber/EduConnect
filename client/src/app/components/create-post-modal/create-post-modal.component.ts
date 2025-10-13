@@ -17,6 +17,7 @@ import { PostService } from '../../services/post.service';
 })
 export class CreatePostModalComponent {
   form: FormGroup;
+  selectedImageBase64: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -30,6 +31,17 @@ export class CreatePostModalComponent {
     });
   }
 
+  onFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.selectedImageBase64 = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
   onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -40,7 +52,7 @@ export class CreatePostModalComponent {
       title: this.form.value.title,
       content: {
         text: this.form.value.text,
-        imageUrl: this.form.value.imageUrl
+        imageUrl: this.selectedImageBase64 ?? undefined
       }
     };
     this.store.dispatch(addPost({ createPostDto: newPost }));

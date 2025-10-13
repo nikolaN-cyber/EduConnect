@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { User } from "./entities/user.entity";
 import { CreateUserDTO, UpdateUserDTO } from "./dto/user.dto";
 import * as bcrypt from 'bcrypt';
@@ -6,12 +6,18 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserRole } from "src/types/enums";
 import { UserPayload } from "src/types/user-payload.interface";
+import { Post } from "src/post/entities/post.entity";
+import { Comment } from "src/comment/entities/comment.entity";
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
-        private userRepository: Repository<User>
+        private userRepository: Repository<User>,
+        @InjectRepository(Post)
+        private postRepository: Repository<Post>,
+        @InjectRepository(Comment)
+        private commentRepository: Repository<Comment>,
     ) { }
 
     async createUser(user: CreateUserDTO): Promise<User> {
@@ -44,7 +50,7 @@ export class UserService {
     }
 
     async deleteAccount(userPayload: UserPayload): Promise<void> {
-        const user = await this.userRepository.findOne({ where: { id: userPayload.sub }});
+        const user = await this.userRepository.findOne({ where: { id: userPayload.sub } });
         if (!user) {
             throw new NotFoundException('User not found');
         }
@@ -52,7 +58,7 @@ export class UserService {
     }
 
     async updateProfile(updateUserDto: UpdateUserDTO, userPayload: UserPayload): Promise<User> {
-        const user = await this.userRepository.findOne({ where: { id: userPayload.sub }});
+        const user = await this.userRepository.findOne({ where: { id: userPayload.sub } });
         if (!user) {
             throw new NotFoundException('User not found');
         }
@@ -60,8 +66,8 @@ export class UserService {
         return await this.userRepository.save(user);
     }
 
-    async findById(id: string): Promise<User|null> {
-        return await this.userRepository.findOne({where: {id}});
+    async findById(id: string): Promise<User | null> {
+        return await this.userRepository.findOne({ where: { id } });
     }
 
     async findByEmail(email: string): Promise<User | null> {
@@ -95,10 +101,29 @@ export class UserService {
     }
 
     async deleteUserByAdmin(userId: string): Promise<void> {
-        const user = await this.userRepository.findOne({where: {id: userId}});
-        if (!user){
+        const user = await this.userRepository.findOne({ where: { id: userId } });
+        if (!user) {
             throw new NotFoundException("User not found!");
         }
         await this.userRepository.remove(user);
+    }
+
+    async getUserComments(userId: string) {
+        return await this.commentRepository.find({
+            where: { author: { id: userId } },
+            relations: ['post', 'post.user'],
+            order: { createdAt: 'DESC' },
+        });
+    }
+
+    async getUserLikedPosts(userId: string) {
+        return await this.postRepository
+            .createQueryBuilder('post')
+            .leftJoinAndSelect('post.user', 'user')
+            .leftJoinAndSelect('post.comments', 'comments')
+            .leftJoinAndSelect('post.usersLiked', 'usersLiked')
+            .where('usersLiked.id = :userId', { userId })
+            .orderBy('post.createdAt', 'DESC')
+            .getMany();
     }
 }

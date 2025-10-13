@@ -1,33 +1,33 @@
 <div class="posts-wrapper">
     <div class="posts-header">
         <h2>All Posts</h2>
+        <input type="text" placeholder="Search by title..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
         <button class="create-post-btn" (click)="openCreatePostModal()">+ New Post</button>
     </div>
 
     <div class="loader" *ngIf="loading$ | async">Loading posts...</div>
 
     <div class="posts-list" *ngIf="!(loading$ | async)">
-        <ng-container *ngIf="posts$ | async as posts">
-            <div class="post-card" *ngFor="let post of posts" (click)="selectPost(post)">
-                <h3 class="post-title">{{ post.title }}</h3>
-                <h3 class="post-title">Author: {{ post.user.username }}</h3>
-                <p class="post-text" *ngIf="post.content?.text">{{ post.content?.text }}</p>
-                <img class="post-image" *ngIf="post.content?.imageUrl" [src]="post.content?.imageUrl"
-                    alt="post image" />
-                <div class="post-info">
-                    <span>{{ post.likes }} Likes</span>
-                    <span>{{ post.comments?.length || 0 }} Comments</span>
-                    <span>{{ post.createdAt | date:'short' }}</span>
-                </div>
-                <button (click)="onDelete(post.id); $event.stopPropagation()" class="delete-button"
-                    *ngIf="post.user?.id === currentUserId">
-                    Delete
-                </button>
-                <button class="like-button" [class.liked]="isLikedByCurrentUser(post)" (click)="onLike(post.id)">
-                    ❤️ {{ post.likes }}
-                </button>
+        <div class="post-card" *ngFor="let post of filteredPosts" (click)="selectPost(post)">
+            <h3 class="post-title">{{ post.title }}</h3>
+            <h3 class="post-title">Author: {{ post.user.username }}</h3>
+            <p class="post-text" *ngIf="post.content?.text">{{ post.content?.text }}</p>
+            <img class="post-image" *ngIf="post.content?.imageUrl" [src]="post.content?.imageUrl" alt="post image" />
+            <div class="post-info">
+                <span>{{ post.likes }} Likes</span>
+                <span>{{ post.comments?.length || 0 }} Comments</span>
+                <span>{{ post.createdAt | date: 'short' }}</span>
             </div>
-        </ng-container>
+
+            <button (click)="onDelete(post.id); $event.stopPropagation()" class="delete-button"
+                *ngIf="post.user?.id === currentUserId">
+                Delete
+            </button>
+
+            <button class="like-button" [class.liked]="isLikedByCurrentUser(post)" (click)="onLike(post.id)">
+                ❤️ {{ post.likes }}
+            </button>
+        </div>
     </div>
 
     <div *ngIf="selectedPost" class="modal-backdrop" (click)="selectedPost = null">

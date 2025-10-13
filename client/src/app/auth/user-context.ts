@@ -34,3 +34,17 @@ export const getToken = (): string | null => {
   }
   return null;
 };
+
+export const isTokenValid = (): boolean => {
+  const token = getToken();
+  if (!token) return false;
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const exp = payload.exp;
+    const now = Math.floor(Date.now() / 1000);
+    return exp > now;
+  } catch (e) {
+    return false;
+  }
+};

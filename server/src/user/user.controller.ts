@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Patch, Delete, Param, UseGuards, Request } from "@nestjs/common";
+import { Controller, Body, Post, Patch, Delete, Param, UseGuards, Request, Get } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDTO, UpdateUserDTO } from "./dto/user.dto";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
@@ -8,7 +8,7 @@ import { Roles } from "src/auth/roles.decorator";
 
 @Controller('api/users')
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService) { }
 
     @Post('register')
     async register(@Body() user: CreateUserDTO) {
@@ -30,7 +30,21 @@ export class UserController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(UserRole.ADMIN)
     @Delete('delete-by-admin/:id')
-    async deleteByAdmin(@Param() id: string){
+    async deleteByAdmin(@Param() id: string) {
         this.userService.deleteUserByAdmin(id);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('my-comments')
+    async getMyComments(@Request() req) {
+        const userId = req.user.sub;
+        return this.userService.getUserComments(userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('my-liked-posts')
+    async getMyLikedPosts(@Request() req) {
+        const userId = req.user.sub;
+        return this.userService.getUserLikedPosts(userId);
     }
 }
