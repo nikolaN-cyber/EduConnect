@@ -46,17 +46,32 @@ export class RegisterComponent {
     }
 
     this.loading = true;
+    const userToSend = { ...this.form };
 
-    try {
-      const userToSend = { ...this.form };
-      await this.userService.register(userToSend);
-      this.snackBar.open('Registration successful! Please login', 'Close', { duration: 3000 });
-      this.router.navigate(['/']);
-    } catch (error: any) {
-      const message = error?.message || 'Registration failed. Try again.';
-      this.snackBar.open(message, 'Close', { duration: 3000 });
-    } finally {
-      this.loading = false;
-    }
+    this.userService.register(userToSend).subscribe({
+      next: () => {
+        this.snackBar.open('Registration successful! Please login', 'Close', { duration: 3000 });
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        let message = 'Registration failed. Try again.';
+
+        if (error.status === 409) {
+          message = 'User with that username or email already exists!';
+        } else if (error?.error?.message) {
+          message = error.error.message;
+        }
+
+        this.snackBar.open(message, 'Close', { duration: 3000 });
+        console.error('Registration error:', error);
+
+        this.loading = false;
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
   }
+
+
 }

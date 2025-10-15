@@ -135,3 +135,19 @@
 .like-button.liked {
     color: red;
 }
+
+.posts-header input[type="text"] {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    outline: none;
+    background-color: #fff;
+    color: #333;
+}
+
+.posts-header input[type="text"]:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}

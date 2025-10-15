@@ -1,7 +1,6 @@
 <div class="modal-backdrop" (click)="closeModal()"></div>
 
 <div class="modal-content">
-    <button class="close-btn" (click)="closeModal()">×</button>
 
     <h2 class="post-title">{{ post.title }}</h2>
     <p class="post-text">{{ post.content?.text }}</p>
@@ -9,46 +8,44 @@
 
     <div class="post-info">
         <span>{{ post.likes }} Likes</span>
-        <span>{{ post.comments?.length || 0 }} Comments</span>
+        <span>{{ (comments$ | async)?.length || 0 }} Comments</span>
         <span>{{ post.createdAt | date:'short' }}</span>
     </div>
 
     <div class="comments-container">
         <h3 class="comments-title">Comments</h3>
 
-        <div class="comments-list" *ngIf="(comments$ | async) as comments; else loading">
-            <div *ngIf="comments.length > 0; else noComments">
-                <div class="comment-item" *ngFor="let comment of visibleComments">
-                    <div *ngIf="editingCommentId === comment.id; else viewComment">
-                        <form [formGroup]="editCommentForm" (ngSubmit)="saveEdit(comment.id)">
-                            <input type="text" formControlName="text" />
-                            <button type="submit" [disabled]="editCommentForm.invalid">Save</button>
-                            <button type="button" (click)="cancelEdit()">Cancel</button>
-                        </form>
-                    </div>
-
-                    <ng-template #viewComment>
-                        <p class="comment-author">{{ comment.author?.username }}</p>
-                        <p class="comment-text">{{ comment.text }}</p>
-                        <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
-
-                        <div class="comment-actions" *ngIf="isAuthor(comment)">
-                            <button (click)="startEdit(comment)">Edit</button>
-                            <button (click)="deleteComment(comment.id)">Delete</button>
-                        </div>
-                    </ng-template>
-                </div>
-
-                <div class="comment-controls">
-                    <button *ngIf="visibleComments.length < comments.length" (click)="loadNext10()">Load next
-                        10</button>
-                    <button *ngIf="visibleComments.length > limit" (click)="showLess()">Show less</button>
-                </div>
-            </div>
-        </div>
-
-        <ng-template #loading>
+        <ng-container *ngIf="loading$ | async; else commentsList">
             <p class="loading">Loading comments...</p>
+        </ng-container>
+
+        <ng-template #commentsList>
+            <ng-container *ngIf="comments$ | async as comments">
+                <div *ngIf="comments.length > 0; else noComments">
+                    <div class="comment-item" *ngFor="let comment of comments">
+
+                        <div *ngIf="editingCommentId === comment.id; else viewComment">
+                            <form [formGroup]="editCommentForm" (ngSubmit)="saveEdit(comment.id)">
+                                <input type="text" formControlName="text" />
+                                <button type="submit" [disabled]="editCommentForm.invalid">Save</button>
+                                <button type="button" (click)="cancelEdit()">Cancel</button>
+                            </form>
+                        </div>
+
+                        <ng-template #viewComment>
+                            <p class="comment-author">{{ comment.author?.username }}</p>
+                            <p class="comment-text">{{ comment.text }}</p>
+                            <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
+
+                            <div class="comment-actions" *ngIf="isAuthor(comment)">
+                                <button (click)="startEdit(comment)">Edit</button>
+                                <button (click)="deleteComment(comment.id)">Delete</button>
+                            </div>
+                        </ng-template>
+
+                    </div>
+                </div>
+            </ng-container>
         </ng-template>
 
         <ng-template #noComments>

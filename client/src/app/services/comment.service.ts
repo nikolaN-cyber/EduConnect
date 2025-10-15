@@ -23,12 +23,7 @@ export class CommentService {
         return this.http.delete<void>(`${environment.api}/comments/delete/${commentId}`);
     }
 
-    loadNext10(nextComments: GetCommentsDto): Observable<Comment[]> {
-        let params = new HttpParams()
-            .set('postId', nextComments.postId)
-            .set('offset', String(nextComments.offset ?? 0))
-            .set('limit', String(nextComments.limit ?? 10));
-
-        return this.http.get<Comment[]>(`${environment.api}/comments/load-next-10`, { params });
+    getCommentsByPost(postId: string): Observable<Comment[]> {
+        return this.http.get<Comment[]>(`${environment.api}/comments/load-comments-for-post/${postId}`);
     }
 }

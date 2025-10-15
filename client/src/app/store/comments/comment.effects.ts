@@ -37,18 +37,10 @@ export class CommentEffects {
         this.loadComments$ = createEffect(() =>
             this.actions$.pipe(
                 ofType(loadComments),
-                mergeMap(({ postId, offset = 0, limit = 10 }) =>
-                    this.store.select(selectToken).pipe(
-                        take(1),
-                        mergeMap(token =>
-                            from(this.commentService.loadNext10({ postId, offset, limit })).pipe(
-                                takeUntil(this.store.select(selectToken).pipe(
-                                    map(t => t === null)
-                                )),
-                                map((comments: Comment[]) => loadCommentsSuccess({ comments, offset })),
-                                catchError(err => of(loadCommentsFailure({ error: err.message || 'Failed to load comments', offset })))
-                            )
-                        )
+                mergeMap(({ postId }) =>
+                    this.commentService.getCommentsByPost(postId).pipe(
+                        map(comments => loadCommentsSuccess({ comments })),
+                        catchError(err => of(loadCommentsFailure({ error: err.message || 'Failed to load comments' })))
                     )
                 )
             )

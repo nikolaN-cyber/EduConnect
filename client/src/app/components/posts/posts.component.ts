@@ -9,7 +9,6 @@ import { SHARED_IMPORTS } from '../../shared/shared-imports';
 import { SinglePostComponent } from '../single-post/single-post.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CreatePostModalComponent } from '../create-post-modal/create-post-modal.component';
-import { PostService } from '../../services/post.service';
 
 @Component({
   selector: 'app-posts',
@@ -30,7 +29,6 @@ export class PostsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<PostsState>,
     private dialog: MatDialog,
-    private postService: PostService
   ) {
     this.posts$ = this.store.select(selectAllPosts);
     this.loading$ = this.store.select(selectPostsLoading);
@@ -42,7 +40,6 @@ export class PostsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store.dispatch(loadPosts());
 
-    // Kad se postovi učitaju, postavi ih odmah kao filteredPosts
     const sub = this.posts$.subscribe(posts => {
       if (posts) {
         this.filteredPosts = posts;
@@ -69,7 +66,6 @@ export class PostsComponent implements OnInit, OnDestroy {
         );
       }
 
-      // Primeri funkcionalnog programiranja:
       const totalLikes = this.filteredPosts.reduce((acc, post) => acc + (post.likes || 0), 0);
       console.log('Total likes of filtered posts:', totalLikes);
 

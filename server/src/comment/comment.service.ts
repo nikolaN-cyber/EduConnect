@@ -68,14 +68,11 @@ export class CommentService {
         return this.commentRepository.save(comment);
     }
 
-    async getCommentsForPost(getCommentsDto: GetCommentsDto): Promise<Comment[]> {
-        const { postId, limit, offset } = getCommentsDto;
+    async getCommentsForPost(postId: string): Promise<Comment[]> {
         return this.commentRepository.find({
             where: { post: { id: postId } },
             order: { createdAt: 'ASC' },
-            skip: offset,
-            take: limit,
-            relations: ['author'],
+            relations: ['author', 'post'],
         });
     }
 }

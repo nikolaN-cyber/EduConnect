@@ -31,8 +31,8 @@ export class CommentController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('load-next-10')
-    async loadNext10Comments(@Query() query: GetCommentsDto){
-        return this.commentService.getCommentsForPost(query)
+    @Get('load-comments-for-post/:postId')
+    async getCommentsByPost(@Param('postId') postId: string){
+        return this.commentService.getCommentsForPost(postId)
     }
 }

@@ -24,7 +24,8 @@
                 Delete
             </button>
 
-            <button class="like-button" [class.liked]="isLikedByCurrentUser(post)" (click)="onLike(post.id)">
+            <button class="like-button" [class.liked]="isLikedByCurrentUser(post)"
+                (click)="onLike(post.id); $event.stopPropagation()">
                 ❤️ {{ post.likes }}
             </button>
         </div>

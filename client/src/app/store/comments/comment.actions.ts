@@ -2,18 +2,18 @@ import { createAction, props } from '@ngrx/store';
 import { Comment, CreateCommentDto, UpdateCommentDto } from '../../models/comment';
 
 export const loadComments = createAction(
-    'loadComments',
-    props<{ postId: string; offset?: number; limit?: number }>()
+    '[Comments] Load Comments',
+    props<{ postId: string }>()
 );
 
 export const loadCommentsSuccess = createAction(
-    'loadCommentsSuccess',
-    props<{ comments: Comment[]; offset?: number }>()
+    '[Comments] Load Comments Success',
+    props<{ comments: Comment[] }>()
 );
 
 export const loadCommentsFailure = createAction(
-    'loadCommentsFailure',
-    props<{ error: string; offset?: number }>()
+    '[Comments] Load Comments Failure',
+    props<{ error: string }>()
 );
 
 export const addComment = createAction(

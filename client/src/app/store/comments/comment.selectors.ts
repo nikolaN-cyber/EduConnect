@@ -19,3 +19,8 @@ export const selectCommentsError = createSelector(
     selectCommentState,
     state => state.error
 );
+
+export const selectCommentsByPostId = (postId: string) => createSelector(
+    selectAllComments,
+    (comments) => comments.filter(comment => comment.post?.id === postId)
+);
